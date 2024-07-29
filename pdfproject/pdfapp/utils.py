@@ -40,10 +40,10 @@ class IndexDoc:
                 sub_chunks += text_splitter.split_documents([chunk])
         
         # Ensure we get the exact required number of subchunks (11 main * 33 sub = 363 subchunks)
-        if len(sub_chunks) > 363:
-            sub_chunks = sub_chunks[:363]
-        elif len(sub_chunks) < 363:
-            print(f"Warning: Only {len(sub_chunks)} subchunks were created, but 363 were expected.")
+        if len(sub_chunks) > 33:
+            sub_chunks = sub_chunks[:33]
+        elif len(sub_chunks) < 33:
+            print(f"Warning: Only {len(sub_chunks)} subchunks were created, but 33 were expected.")
         
         print(f"Document split into {len(sub_chunks)} subchunks.")
         
