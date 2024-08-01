@@ -26,8 +26,8 @@ class IndexDoc:
         
         # Initial split into 11 main chunks
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=500,
-            chunk_overlap=30,
+            chunk_size=1028,
+            chunk_overlap=150,
         )
         main_chunks = text_splitter.split_documents(docs)
         main_chunks = [main_chunks[i::11] for i in range(11)]
@@ -93,3 +93,7 @@ if __name__ == '__main__':
             break
         response = index.retrieve(user_input, db_type="chroma_db")
         print(response if response else "No relevant information found.")
+
+
+
+
