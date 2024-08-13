@@ -11,6 +11,7 @@ import chromadb
 from langchain.vectorstores import Chroma
 from langchain_openai import ChatOpenAI
 from sympy import per
+<<<<<<< Updated upstream
 
 load_dotenv()
 
@@ -19,12 +20,40 @@ class IndexDoc:
     def index(self, db_name="chromadb"):
         try:
             loader = PyPDFLoader('D:/pdfproject/media/uploads/10840-001-chunks.pdf')
+=======
+import os
+ 
+load_dotenv()
+ 
+def format_response(text):
+    # Format the text to preserve newlines for better readability
+    return text.replace('\n', '<br>')
+ 
+def find_file_name(file_path):
+    
+    # Extract the filename from the path
+    # Split the path by 'uploads' and get the second part
+    file_name = file_path.split('uploads/')[-1]
+ 
+    print("file_name",file_name)
+    return file_name
+ 
+ 
+ 
+ 
+class IndexDoc:
+ 
+    def index(self, file_path, db_name):
+        try:
+            loader = PyPDFLoader(file_path)
+>>>>>>> Stashed changes
             docs = loader.load()
             print("Documents loaded successfully.")
         except Exception as e:
             print(f"Error loading documents: {e}")
             return
         
+<<<<<<< Updated upstream
         # Initial split into 11 main chunks
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=500,
@@ -64,6 +93,35 @@ class IndexDoc:
                 db = Chroma(persist_directory="./chroma_db", embedding_function=OpenAIEmbeddings())
             else:
                 db = FAISS.load_local("faiss_db", embeddings=OpenAIEmbeddings(), allow_dangerous_deserialization=True)
+=======
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=2000,
+            chunk_overlap=200,
+        )
+ 
+        chunks = []
+        for doc in docs:
+            doc_chunks = text_splitter.split_text(doc.page_content)
+            for i, chunk in enumerate(doc_chunks):
+                chunks.append({
+                    "text": chunk,
+                    "metadata": {"page": doc.metadata["page"]}  # Storing page number in metadata
+                })
+        
+        persist_directory = db_name
+        
+        vectorstore = Chroma.from_documents(
+            documents=chunks, embedding=OpenAIEmbeddings(), persist_directory=persist_directory).as_retriever()
+        
+        print(f"Document embedded and stored in the database {persist_directory}.")
+ 
+        
+ 
+    def retrieve(self, query, db_name="chroma_db", file_path=""):
+        try:
+            llm = ChatOpenAI(model_name="gpt-4-turbo")
+            db = Chroma(persist_directory=db_name, embedding_function=OpenAIEmbeddings())
+>>>>>>> Stashed changes
             retrv = db.as_retriever(search_type="similarity", search_kwargs={"k": 5})
             docs = retrv.get_relevant_documents(query)
             print(f"Retrieved {len(docs)} relevant documents.")
@@ -71,6 +129,7 @@ class IndexDoc:
             memory = ConversationBufferMemory(llm=llm, memory_key="chat_history", return_messages=True)
             chain = ConversationalRetrievalChain.from_llm(llm=llm, retriever=retrv, memory=memory)
             res = chain.invoke(query)
+<<<<<<< Updated upstream
             return res['answer']
         except Exception as e:
             print(f"Error retrieving documents: {e}")
@@ -85,3 +144,17 @@ if __name__ == '__main__':
             break
         response = index.retrieve(user_input, db_type="chroma_db")
         print(response if response else "No relevant information found.")
+=======
+            
+            response = format_response(res['answer'])
+            
+            # Retrieve page numbers from metadata
+            pages = list(set(doc.metadata.get("page", "Unknown") for doc in docs))
+            pages.sort()  # Sort page numbers
+            pages_info = "Relevant page numbers: " + ", ".join(map(str, pages))
+            
+            return response + "<br>" + pages_info
+        except Exception as e:
+            print(f"Error retrieving documents: {e}")
+            return None
+>>>>>>> Stashed changes
