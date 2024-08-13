@@ -1,8 +1,4 @@
 from django.shortcuts import render
-<<<<<<< Updated upstream
-
-# Create your views here.
-=======
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -64,4 +60,3 @@ class SearchCompaniesView(APIView):
             serializer = CompanySerializer(companies, many=True)
             return Response(serializer.data)
         return Response([])  # Return an empty list if no query provided
->>>>>>> Stashed changes
